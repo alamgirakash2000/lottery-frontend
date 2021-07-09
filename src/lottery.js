@@ -56,4 +56,10 @@ const abi = [
   },
 ];
 
-export default new web3.eth.Contract(abi, address);
+let contract = false;
+
+if (web3) {
+  contract = new web3.eth.Contract(abi, address);
+}
+
+export default contract;

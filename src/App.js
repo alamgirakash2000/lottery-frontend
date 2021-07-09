@@ -16,7 +16,7 @@ function App() {
     msg: "",
     status: "",
   });
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,7 +24,9 @@ function App() {
       setPlayers(await lottery.methods.getPlayers().call());
       setBalance(await web3.eth.getBalance(lottery.options.address));
     };
-    fetchData();
+    if (web3) {
+      fetchData();
+    }
   }, [message]);
 
   const handleSubmit = async (e) => {
@@ -60,60 +62,67 @@ function App() {
 
   return (
     <div className='app'>
-      <div className='container py-5'>
-        <h1 className='text-center'> Welcome to Lottery Contract</h1>
-        <p>
-          This is an smart contract running on Ethereum Rinkeby network. Here
-          anyone can enter as a player. One has to pay minimum 0.011 Rinkeby
-          test Ether to enter this competition. When sufficient number of player
-          will enter, the manager will pick a winner by random generator
-          algorithm. And the winner will automatically get all the available
-          Ether in this contract.
-        </p>
-        <h2>INFO : </h2>
-        <hr />
-        <p>
-          This contract is managed by: <b className='text-primary'>{manager}</b>{" "}
-        </p>
-        <p>
-          Number of entered players:{" "}
-          <b className='text-primary'>{players?.length}</b>
-        </p>
-        <p>
-          Amount of Rinkeby Ether:{" "}
-          <b className='text-primary'>{web3.utils.fromWei(balance, "ether")}</b>
-        </p>
-        <br />
+      {!web3 ? (
+        <p>No Account</p>
+      ) : (
+        <div className='container py-5'>
+          <h1 className='text-center'> Welcome to Lottery Contract</h1>
+          <p>
+            This is an smart contract running on Ethereum Rinkeby network. Here
+            anyone can enter as a player. One has to pay minimum 0.011 Rinkeby
+            test Ether to enter this competition. When sufficient number of
+            player will enter, the manager will pick a winner by random
+            generator algorithm. And the winner will automatically get all the
+            available Ether in this contract.
+          </p>
+          <h2>INFO : </h2>
+          <hr />
+          <p>
+            This contract is managed by:{" "}
+            <b className='text-primary'>{manager}</b>{" "}
+          </p>
+          <p>
+            Number of entered players:{" "}
+            <b className='text-primary'>{players?.length}</b>
+          </p>
+          <p>
+            Amount of Rinkeby Ether:{" "}
+            <b className='text-primary'>
+              {web3.utils.fromWei(balance, "ether")}
+            </b>
+          </p>
+          <br />
 
-        <h2>Want to try your luck?</h2>
-        <hr />
-        <form onSubmit={handleSubmit}>
-          <div class='form-group'>
-            <label labelFor='value'>Enter the amount of Ether:</label>
-            <input
-              type='text'
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className='form-control w-50'
-              id='value'
-              aria-describedby='valueHelp'
-              placeholder='Ex. 0.012'
-            />
-            <small id='valueHelp' className='form-text text-muted'>
-              Minimum amount should be 0.011
-            </small>
-          </div>
-          <button type='submit' className='btn-lg my-4 btn-success'>
-            Enter
-          </button>
-        </form>
-        <MessageModal message={message} open={open} setOpen={setOpen} />
-        <PickWinnerModal
-          message={message}
-          setMessage={setMessage}
-          setOpen={setOpen}
-        />
-      </div>
+          <h2>Want to try your luck?</h2>
+          <hr />
+          <form onSubmit={handleSubmit}>
+            <div className='form-group'>
+              <label>Enter the amount of Ether:</label>
+              <input
+                type='text'
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                className='form-control w-50'
+                id='value'
+                aria-describedby='valueHelp'
+                placeholder='Ex. 0.012'
+              />
+              <small id='valueHelp' className='form-text text-muted'>
+                Minimum amount should be 0.011
+              </small>
+            </div>
+            <button type='submit' className='btn-lg my-4 btn-success'>
+              Enter
+            </button>
+          </form>
+          <MessageModal message={message} open={open} setOpen={setOpen} />
+          <PickWinnerModal
+            message={message}
+            setMessage={setMessage}
+            setOpen={setOpen}
+          />
+        </div>
+      )}
     </div>
   );
 }
